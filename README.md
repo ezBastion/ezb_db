@@ -7,9 +7,9 @@ with the configuration DataBase.
 ## No drivers
 
 For performance and memory foot print, each ezb_db embeds a native sql driver. Use
-the binary corresponding to your sql engine (see git branch), ezb_db was compiled for:
+binary corresponding to your sql engine (see git branch), ezb_db was compiled for:
 - **MSSql** SQL Server 2005 or newer, Azure SQL Database https://github.com/denisenkom/go-mssqldb
-- **Mysql** (4.1+), MariaDB, Percona Server, Google CloudSQL or Sphinx (2.2.3+) https://github.com/go-sql-driver/mysql)
+- **Mysql** (4.1+), MariaDB, Percona Server, Google CloudSQL or Sphinx (2.2.3+) https://github.com/go-sql-driver/mysql
 - **Postgres** https://github.com/lib/pq
 - **Sqlite** https://github.com/mattn/go-sqlite3
 

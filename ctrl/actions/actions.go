@@ -16,8 +16,8 @@
 package actions
 
 import (
-	"ezb_db/models"
-	"ezb_db/tools"
+	"github.com/ezBastion/ezb_db/models"
+	"github.com/ezBastion/ezb_db/tools"
 	"fmt"
 	"net/http"
 

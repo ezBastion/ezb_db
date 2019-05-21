@@ -20,9 +20,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"ezb_db/Middleware"
-	"ezb_db/configuration"
-	"ezb_db/routes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -32,6 +29,11 @@ import (
 	"path"
 	"path/filepath"
 	"time"
+
+	"github.com/ezBastion/ezb_db/configuration"
+	"github.com/ezBastion/ezb_db/routes"
+
+	"github.com/ezBastion/ezb_db/Middleware"
 
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"

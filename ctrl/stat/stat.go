@@ -17,9 +17,10 @@ package stat
 
 import (
 	"bytes"
-	"ezb_db/tools"
 	"fmt"
 	"net/http"
+
+	"github.com/ezBastion/ezb_db/tools"
 
 	"github.com/gin-gonic/gin"
 )

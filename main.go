@@ -15,10 +15,11 @@
 package main
 
 import (
-	"ezb_db/setup"
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/ezBastion/ezb_db/setup"
 
 	"github.com/urfave/cli"
 	"golang.org/x/sys/windows/svc"

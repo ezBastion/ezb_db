@@ -18,10 +18,12 @@ package configuration
 import (
 	"crypto/sha256"
 	"errors"
-	m "ezb_db/models"
-	"ezb_db/tools"
 	"fmt"
 	"path"
+
+	m "github.com/ezBastion/ezb_db/models"
+
+	"github.com/ezBastion/ezb_db/tools"
 
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"

@@ -25,7 +25,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"encoding/pem"
-	"ezb_db/configuration"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -35,6 +34,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/ezBastion/ezb_db/configuration"
 
 	fqdn "github.com/ShowMax/go-fqdn"
 )

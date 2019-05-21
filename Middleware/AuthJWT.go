@@ -20,10 +20,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"ezb_db/configuration"
-	"ezb_db/models"
 	"fmt"
 	"io/ioutil"
+
+	"github.com/ezBastion/ezb_db/configuration"
+	"github.com/ezBastion/ezb_db/models"
 
 	"net/http"
 	"os"

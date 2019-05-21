@@ -1,8 +1,6 @@
-# ezBastion DataBase access microservice.
+#  Database service (ezb_db)
 
-**ezb_db** is a *rest to sql* microservice. It was use by ezBastion modules to interact
-with the configuration DataBase.
-
+The DB service, is a CRUD interface between ezBastion nodes and your database.
 
 ## No drivers
 
@@ -13,21 +11,78 @@ binary corresponding to your sql engine (see git branch), ezb_db was compiled fo
 - **Postgres** https://github.com/lib/pq
 - **Sqlite** https://github.com/mattn/go-sqlite3
 
-## No setup
-
-You can install ezb_db as much as you need on Linux, Mac and Windows. As it uses
-Rest (http) infrastructure, put it behind a load balancer and be elastic.
-
-- **Copy** binary and json files somewhere (folder, docker, saas).
-- **Configure** json file with you DataBase information and choose listen port.
-- In a console, **start** the binary (see options below).
+## SETUP
 
 
-## ezb_db Options
+### 1. Download ezb_db from [GitHub](<https://github.com/ezBastion/ezb_db/releases/latest>)
 
-- **init** Create or update DataBase tables and views.
-- **install** Create Deamon/Service on the computer.
-- **remove** Delete Deamon or service.
-- **debug** Start ezb_db on the console and output all request made (verbose).
-- **start** Start the Deamon or Service.
-- **stop** Stop the Deamon or Service.
+### 2. Open an admin command prompte, like CMD or Powershell.
+
+### 3. Run ezb_db.exe with **init** option.
+
+```powershell
+    PS E:\ezbastion\ezb_db> ezb_db init
+```
+
+this commande will create folder and the default config.json file.
+```json
+{
+    "listenjwt":"0.0.0.0:8443",
+    "listenpki":"0.0.0.0:8444",
+    "jwtpubkey":"cert\\ezb_sta-pub.crt",
+    "privatekey":"cert\\ezb_db.key",
+    "publiccert":"cert\\ezb_db.crt",
+    "cacert":"cert\\ezb_pki-ca.crt",
+    "servicename":"ezb_db",
+    "servicefullname":"Easy Bastion Database",
+    "db":"mssql",
+    "debug": true,
+    "sqlite":{
+        "dbpath":"conf\\ezb.db"
+    },
+    "mysql":{
+        "host":"localhost",
+        "port":3306,
+        "user":"chavers",
+        "password":"********",
+        "database":"ezbastion"
+    },
+    "mssql":{
+        "host":"localhost",
+        "database":"ezbastion",
+        "user":"domain\\dbowner",
+        "password":"********",
+        "instance":""
+    }
+}
+```
+
+### 4. Install Windows service and start it.
+
+```powershell
+    PS E:\ezbastion\ezb_db> ezb_db install
+    PS E:\ezbastion\ezb_db> ezb_db start
+```
+
+
+
+
+## Copyright
+
+Copyright (C) 2018 Renaud DEVERS info@ezbastion.com
+<p align="center">
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL%20v3-blueviolet.svg?style=for-the-badge&logo=gnu" alt="License"></a></p>
+
+
+Used library:
+
+Name      | Copyright | version | url
+----------|-----------|--------:|----------------------------
+gin       | MIT       | 1.2     | github.com/gin-gonic/gin
+cli       | MIT       | 1.20.0  | github.com/urfave/cli
+gorm      | MIT       | 1.9.2   | github.com/jinzhu/gorm
+logrus    | MIT       | 1.0.4   | github.com/sirupsen/logrus
+go-fqdn   | Apache v2 | 0       | github.com/ShowMax/go-fqdn
+jwt-go    | MIT       | 3.2.0   | github.com/dgrijalva/jwt-go
+gopsutil  | BSD       | 2.15.01 | github.com/shirou/gopsutil
+

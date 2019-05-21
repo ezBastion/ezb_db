@@ -1,0 +1,29 @@
+{
+    "listenjwt":"0.0.0.0:8443",
+    "listenpki":"0.0.0.0:8444",
+    "jwtpubkey":"cert\\ezb_sta-pub.crt",
+    "privatekey":"cert\\ezb_db.key",
+    "publiccert":"cert\\ezb_db.crt",
+    "cacert":"cert\\ezb_pki-ca.crt",
+    "servicename":"ezb_db",
+    "servicefullname":"Easy Bastion Database",
+    "db":"mssql",
+    "debug": true,
+    "sqlite":{
+        "dbpath":"conf\\ezb.db"
+    },
+    "mysql":{
+        "host":"localhost",
+        "port":3306,
+        "user":"chavers",
+        "password":"********",
+        "database":"ezbastion"
+    },
+    "mssql":{
+        "host":"localhost",
+        "database":"ezbastion",
+        "user":"domain\\dbowner",
+        "password":"********",
+        "instance":""
+    }
+}

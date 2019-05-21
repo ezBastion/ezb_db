@@ -1,0 +1,9 @@
+*.exe
+*.db
+conf/config.json
+*.crt
+*.key
+log/
+cert/
+db/
+*.sql

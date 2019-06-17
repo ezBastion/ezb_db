@@ -1,9 +1,11 @@
 *.exe
 *.db
-conf/config.json
+*.json
 *.crt
 *.key
 log/
 cert/
 db/
 *.sql
+*.syso
+*.ico

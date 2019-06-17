@@ -1,3 +1,7 @@
+//go:generate  goversioninfo -64 -platform-specific=false
+
+// -manifest=C:\Users\chavers\go\src\github.com\josephspurrier\goversioninfo\testdata\resource\goversioninfo.exe.manifest
+
 // This file is part of ezBastion.
 
 //     ezBastion is free software: you can redistribute it and/or modify

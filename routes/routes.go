@@ -31,12 +31,18 @@ import (
 	"github.com/ezBastion/ezb_db/ctrl/stat"
 	"github.com/ezBastion/ezb_db/ctrl/tags"
 	"github.com/ezBastion/ezb_db/ctrl/workers"
+	"github.com/ezbastion/ezb_db/ctrl/license"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Routes(route *gin.Engine) {
 
+	License := route.Group("/license")
+	{
+		License.GET("", license.Find)
+		License.PUT("", license.Update)
+	}
 	Access := route.Group("/access")
 	{
 		Access.GET("", access.Find)

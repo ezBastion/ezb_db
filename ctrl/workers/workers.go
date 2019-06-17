@@ -27,6 +27,8 @@ import (
 
 func Find(c *gin.Context) {
 	db, err := tools.Getdbconn(c)
+	wl, _ := c.MustGet("wksLimit").(int)
+
 	if err != "" {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -38,7 +40,12 @@ func Find(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, Workers)
+	if wl == 0 || wl > len(Workers) {
+		c.JSON(http.StatusOK, Workers)
+	} else {
+		c.JSON(http.StatusOK, Workers[0:wl])
+	}
+	// c.JSON(http.StatusOK, Workers)
 }
 func Findone(c *gin.Context) {
 	db, err := tools.Getdbconn(c)
@@ -64,7 +71,7 @@ func Findone(c *gin.Context) {
 }
 func Add(c *gin.Context) {
 	var Raw models.EzbWorkers
-
+	wl, _ := c.MustGet("wksLimit").(int)
 	db, err := tools.Getdbconn(c)
 	if err != "" {
 		c.JSON(http.StatusInternalServerError, err)
@@ -76,12 +83,16 @@ func Add(c *gin.Context) {
 	}
 	var nbWorker int
 	db.Model(&models.EzbWorkers{}).Count(&nbWorker)
-	db.NewRecord(&Raw)
-	if err := db.Create(&Raw).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		return
+	if nbWorker < wl || wl == 0 {
+		db.NewRecord(&Raw)
+		if err := db.Create(&Raw).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+		c.JSON(http.StatusCreated, &Raw)
+	} else {
+		c.JSON(http.StatusUnavailableForLegalReasons, "license limit reached")
 	}
-	c.JSON(http.StatusCreated, &Raw)
 }
 
 func Update(c *gin.Context) {

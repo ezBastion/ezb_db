@@ -38,8 +38,6 @@ import (
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mssql"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
@@ -51,7 +49,7 @@ var (
 
 func init() {
 }
-func routerJWT(db *gorm.DB, conf configuration.Configuration) http.Handler {
+func routerJWT(db *gorm.DB, lic configuration.License, conf configuration.Configuration) http.Handler {
 	loggerJWT := log.WithFields(log.Fields{"module": "jwt", "type": "log"})
 	r := gin.Default()
 	r.Use(ginrus.Ginrus(loggerJWT, time.RFC3339, true))
@@ -61,11 +59,12 @@ func routerJWT(db *gorm.DB, conf configuration.Configuration) http.Handler {
 	})
 	r.Use(Middleware.DBMiddleware(db))
 	r.Use(Middleware.AuthJWT(db, conf))
+	r.Use(Middleware.LicenseMiddleware(lic))
 	routes.Routes(r)
 	return r
 }
 
-func routerPKI(db *gorm.DB) http.Handler {
+func routerPKI(db *gorm.DB, lic configuration.License) http.Handler {
 	loggerPKI := log.WithFields(log.Fields{"module": "pki", "type": "log"})
 	r := gin.Default()
 	r.Use(ginrus.Ginrus(loggerPKI, time.RFC3339, true))
@@ -74,6 +73,7 @@ func routerPKI(db *gorm.DB) http.Handler {
 		c.AbortWithStatus(200)
 	})
 	r.Use(Middleware.DBMiddleware(db))
+	r.Use(Middleware.LicenseMiddleware(lic))
 	routes.Routes(r)
 	return r
 }
@@ -93,7 +93,7 @@ func mainGin(serverchan *chan bool) {
 	exPath := filepath.Dir(ex)
 	// }
 	conf := configuration.Configuration{}
-
+	lic := configuration.License{}
 	confFile := path.Join(exPath, "conf\\config.json")
 
 	configFile, err := os.Open(confFile)
@@ -162,6 +162,11 @@ func mainGin(serverchan *chan bool) {
 		log.Fatal(err)
 		panic(err)
 	}
+	err = configuration.InitLic(&lic, db)
+	if err != nil {
+		elog.Error(652, err.Error())
+		log.Fatal(err)
+	}
 	caCert, err := ioutil.ReadFile(path.Join(exPath, conf.CaCert))
 	if err != nil {
 		elog.Error(652, err.Error())
@@ -178,7 +183,7 @@ func mainGin(serverchan *chan bool) {
 	serverJWT := &http.Server{
 		Addr:      conf.ListenJWT,
 		TLSConfig: tlsConfigJWT,
-		Handler:   routerJWT(db, conf),
+		Handler:   routerJWT(db, lic, conf),
 	}
 	/* listner jwt */
 	/* listner pki */
@@ -195,7 +200,7 @@ func mainGin(serverchan *chan bool) {
 	serverPKI := &http.Server{
 		Addr:      conf.ListenPKI,
 		TLSConfig: tlsConfigPKI,
-		Handler:   routerPKI(db),
+		Handler:   routerPKI(db, lic),
 	}
 	/* listner pki */
 

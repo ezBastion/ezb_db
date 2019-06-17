@@ -16,16 +16,18 @@
 package actions
 
 import (
-	"github.com/ezBastion/ezb_db/models"
-	"github.com/ezBastion/ezb_db/tools"
 	"fmt"
 	"net/http"
+
+	"github.com/ezBastion/ezb_db/models"
+	"github.com/ezBastion/ezb_db/tools"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Find(c *gin.Context) {
 	db, err := tools.Getdbconn(c)
+	al, _ := c.MustGet("apiLimit").(int)
 	if err != "" {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -42,7 +44,13 @@ func Find(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, Action)
+	if al == 0 {
+		c.JSON(http.StatusOK, Action)
+	} else if al > len(Action) {
+		c.JSON(http.StatusOK, Action)
+	} else {
+		c.JSON(http.StatusOK, Action[0:al])
+	}
 }
 
 func Findone(c *gin.Context) {

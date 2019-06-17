@@ -22,6 +22,7 @@ import (
 	"path"
 
 	m "github.com/ezBastion/ezb_db/models"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/ezBastion/ezb_db/tools"
 
@@ -53,58 +54,13 @@ func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 			return nil, err
 		}
 		db.Exec("PRAGMA foreign_keys = OFF")
-	// case "mysql":
-	// 	cfg := mysql.NewConfig()
-	// 	cfg.DBName = conf.MYSQL.Database
-	// 	cfg.Params = map[string]string{
-	// 		"charset":   "utf8",
-	// 		"parseTime": "True",
-	// 		"loc":       "Local",
-	// 	}
-	// 	cfg.User = conf.MYSQL.User
-	// 	cfg.Passwd = conf.MYSQL.Password
-	// 	cfg.Net = fmt.Sprintf("tcp(%s:%d)", conf.MYSQL.Host, conf.MYSQL.Port)
-	// 	actual := cfg.FormatDSN()
-	// 	fmt.Println(actual)
-	// 	db, err = gorm.Open("mysql", actual)
-	// 	if err != nil {
-	// 		fmt.Printf("sql.Open err: %s\n", err)
-	// 		return nil, err
-	// 	}
-	// case "mssql":
-	// 	query := url.Values{}
-	// 	query.Add("database", conf.MSSQL.Database)
-	// 	var u *url.URL
-	// 	if conf.MSSQL.Instance == "" {
-	// 		u = &url.URL{
-	// 			Scheme:   "sqlserver",
-	// 			User:     url.UserPassword(conf.MSSQL.User, conf.MSSQL.Password),
-	// 			Host:     conf.MSSQL.Host,
-	// 			Path:     conf.MSSQL.Instance,
-	// 			RawQuery: query.Encode(),
-	// 		}
-	// 	} else {
-	// 		u = &url.URL{
-	// 			Scheme:   "sqlserver",
-	// 			User:     url.UserPassword(conf.MSSQL.User, conf.MSSQL.Password),
-	// 			Host:     conf.MSSQL.Host,
-	// 			RawQuery: query.Encode(),
-	// 		}
-	// 	}
-	// 	connectionString := u.String()
-	// 	db, err = gorm.Open("mssql", connectionString)
-	// 	if err != nil {
-	// 		fmt.Printf("sql.Open err: %s\n", err)
-	// 		return nil, err
-	// 	}
+
 	default:
 		log.Fatal(errors.New("unknow db type."))
 		panic("unknow db type.")
 	}
 	db.SetLogger(&GormLogger{})
-	// if conf.Debug {
-	// 	db.LogMode(true)
-	// }
+
 	db.SingularTable(true)
 	if !db.HasTable(&m.EzbAccess{}) {
 		db.CreateTable(&m.EzbAccess{})
@@ -170,6 +126,15 @@ func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 		db.Model(&m.EzbBastions{}).AddUniqueIndex("idx_bastions_id", "id")
 		Bastion := m.EzbBastions{Name: "changeme"}
 		db.FirstOrCreate(&Bastion)
+	}
+	if !db.HasTable(&m.EzbLicense{}) {
+		db.CreateTable(&m.EzbLicense{})
+		serial, err := uuid.NewV4()
+		if err != nil {
+			serial, _ = uuid.FromString(tools.RandString(32))
+		}
+		Serial := m.EzbLicense{UUID: fmt.Sprintf("%s", serial), Level: "LTE", WKS: 2, API: 20}
+		db.FirstOrCreate(&Serial)
 	}
 	if !db.HasTable(&m.EzbApi{}) {
 		var viewApi = `
@@ -268,7 +233,7 @@ func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 	}
 	tables := []interface{}{&m.EzbAccess{}, &m.EzbAccounts{}, &m.EzbActions{}, &m.EzbCollections{},
 		&m.EzbControllers{}, &m.EzbGroups{}, &m.EzbJobs{}, &m.EzbTags{}, &m.EzbWorkers{}, &m.EzbLogs{},
-		&m.EzbStas{}, &m.EzbBastions{}}
+		&m.EzbStas{}, &m.EzbBastions{}, &m.EzbLicense{}}
 	db.AutoMigrate(tables...)
 
 	// sandbox(db)

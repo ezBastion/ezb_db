@@ -16,19 +16,20 @@
 package api
 
 import (
-	"github.com/ezBastion/ezb_db/models"
-	"github.com/ezBastion/ezb_db/tools"
 	"fmt"
 	"net/http"
 	"regexp"
 	s "strings"
+
+	"github.com/ezBastion/ezb_db/models"
+	"github.com/ezBastion/ezb_db/tools"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Find(c *gin.Context) {
 	var Raw []models.EzbApi
-
+	al, _ := c.MustGet("apiLimit").(int)
 	db, err := tools.Getdbconn(c)
 	if err != "" {
 		c.JSON(http.StatusInternalServerError, err)
@@ -45,7 +46,10 @@ func Find(c *gin.Context) {
 		RGX string `json:"regex"`
 	}
 	var Ret []api
-	for _, r := range Raw {
+	for i, r := range Raw {
+		if i > al {
+			break
+		}
 		var a api
 		a.ID = r.ID
 		a.URL = fmt.Sprintf("%s %s/v%d/%s/%s", r.Access, r.Bastion, r.Version, r.Ctrl, r.Action)

@@ -19,6 +19,15 @@ import (
 	"time"
 )
 
+type EzbLicense struct {
+	ID    int    `json:"id" gorm:"primary_key"`
+	UUID  string `json:"uuid"`
+	Level string `json:"level"`
+	WKS   int    `json:"workers"`
+	API   int    `json:"api"`
+	SA    string `json:"saexpiry"`
+	Sign  string `json:"sign"`
+}
 type EzbActions struct {
 	ID               int              `json:"id" gorm:"primary_key"`
 	Name             string           `gorm:"size:250;not null" json:"name"`
@@ -168,7 +177,6 @@ type EzbLogs struct {
 	Size       int       `json:"size"`
 	Error      string    `json:"error"`
 }
-
 
 type EzbAccountsActions struct {
 	Account   string `json:"account"`

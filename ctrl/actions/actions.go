@@ -44,9 +44,7 @@ func Find(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	if al == 0 {
-		c.JSON(http.StatusOK, Action)
-	} else if al > len(Action) {
+	if al == 0 || al > len(Action) {
 		c.JSON(http.StatusOK, Action)
 	} else {
 		c.JSON(http.StatusOK, Action[0:al])

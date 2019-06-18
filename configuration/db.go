@@ -16,8 +16,11 @@
 package configuration
 
 import (
+	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/base64"
 	"errors"
+	t "ezb_priv/tools"
 	"fmt"
 	"path"
 
@@ -133,7 +136,13 @@ func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 		if err != nil {
 			serial, _ = uuid.FromString(tools.RandString(32))
 		}
-		Serial := m.EzbLicense{UUID: fmt.Sprintf("%s", serial), Level: "LTE", WKS: 2, API: 20}
+		msg := []byte(fmt.Sprintf("ENT 1970-01-01 2 20 %s", serial))
+		key := []byte(t.EncryptDecrypt(fmt.Sprintf("%s", serial)))
+		mac := hmac.New(sha256.New, key)
+		mac.Write(msg)
+		expectedMAC := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+		Serial := m.EzbLicense{UUID: fmt.Sprintf("%s", serial), Level: "ENT", WKS: 2, API: 20, Sign: expectedMAC, SA: "1970-01-01"}
+		// Serial := m.EzbLicense{UUID: fmt.Sprintf("%s", serial), Level: "LTE", WKS: 0, API: 0}
 		db.FirstOrCreate(&Serial)
 	}
 	if !db.HasTable(&m.EzbApi{}) {

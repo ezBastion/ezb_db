@@ -37,8 +37,8 @@ func InitLic(lic *License, db *gorm.DB) error {
 			mac.Write(msg)
 			expectedMAC := base64.StdEncoding.EncodeToString(mac.Sum(nil))
 			if Lic.Sign == expectedMAC {
-				lic.WksLimit = 0
-				lic.ApiLimit = 0
+				lic.WksLimit = Lic.WKS
+				lic.ApiLimit = Lic.API
 			} else {
 				return errors.New("License error L0013")
 			}

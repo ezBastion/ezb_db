@@ -6,9 +6,6 @@ The DB service, is a CRUD interface between ezBastion nodes and your database.
 
 For performance and memory foot print, each ezb_db embeds a native sql driver. Use
 binary corresponding to your sql engine (see git branch), ezb_db was compiled for:
-- **MSSql** SQL Server 2005 or newer, Azure SQL Database https://github.com/denisenkom/go-mssqldb
-- **Mysql** (4.1+), MariaDB, Percona Server, Google CloudSQL or Sphinx (2.2.3+) https://github.com/go-sql-driver/mysql
-- **Postgres** https://github.com/lib/pq
 - **Sqlite** https://github.com/mattn/go-sqlite3
 
 ## SETUP
@@ -27,35 +24,31 @@ binary corresponding to your sql engine (see git branch), ezb_db was compiled fo
 this commande will create folder and the default config.json file.
 ```json
 {
-    "listenjwt":"0.0.0.0:8443",
-    "listenpki":"0.0.0.0:8444",
-    "jwtpubkey":"cert\\ezb_sta-pub.crt",
-    "privatekey":"cert\\ezb_db.key",
-    "publiccert":"cert\\ezb_db.crt",
-    "cacert":"cert\\ezb_pki-ca.crt",
-    "servicename":"ezb_db",
-    "servicefullname":"Easy Bastion Database",
-    "db":"mssql",
-    "debug": true,
-    "sqlite":{
-        "dbpath":"conf\\ezb.db"
+    "listenjwt": ":5501",
+    "listenpki": ":5502",
+    "privatekey": "cert/ezb_db.key",
+    "publiccert": "cert/ezb_db.crt",
+    "cacert": "cert/ca.crt",
+    "db": "sqlite",
+    "sqlite": {
+        "dbpath": "db/ezb_db.db"
     },
-    "mysql":{
-        "host":"localhost",
-        "port":3306,
-        "user":"chavers",
-        "password":"********",
-        "database":"ezbastion"
-    },
-    "mssql":{
-        "host":"localhost",
-        "database":"ezbastion",
-        "user":"domain\\dbowner",
-        "password":"********",
-        "instance":""
-    }
+    "servicename": "ezb_db",
+    "servicefullname": "ezBastion Database",
+    "loglevel": "debug",
+    "ezb_pki": "change.me:5500",
+    "san": [
+        "change.me",
+        "www.change.me"
+    ],
+    "default_sta": "https://your.sta.fqdn:5503/token"
 }
 ```
+
+- default_sta: Used during db initialisation, to set the default authentification node. This STA provide authent for admin console.
+- listenjwt: HTTP listner address and port used by admin console.
+- listenpki: HTTP listner address and port used by STA and bastion (ezb_srv)
+- ezb_pki: TCP listner address and port used to request certificat.
 
 ### 4. Install Windows service and start it.
 
@@ -76,13 +69,14 @@ Copyright (C) 2018 Renaud DEVERS info@ezbastion.com
 
 Used library:
 
-Name      | Copyright | version | url
-----------|-----------|--------:|----------------------------
-gin       | MIT       | 1.2     | github.com/gin-gonic/gin
-cli       | MIT       | 1.20.0  | github.com/urfave/cli
-gorm      | MIT       | 1.9.2   | github.com/jinzhu/gorm
-logrus    | MIT       | 1.0.4   | github.com/sirupsen/logrus
-go-fqdn   | Apache v2 | 0       | github.com/ShowMax/go-fqdn
-jwt-go    | MIT       | 3.2.0   | github.com/dgrijalva/jwt-go
-gopsutil  | BSD       | 2.15.01 | github.com/shirou/gopsutil
-
+Name       | Copyright | version | url
+-----------|-----------|--------:|----------------------------
+gin        | MIT       | 1.2     | github.com/gin-gonic/gin
+cli        | MIT       | 1.20.0  | github.com/urfave/cli
+gorm       | MIT       | 1.9.2   | github.com/jinzhu/gorm
+logrus     | MIT       | 1.0.4   | github.com/sirupsen/logrus
+go-fqdn    | Apache v2 | 0       | github.com/ShowMax/go-fqdn
+jwt-go     | MIT       | 3.2.0   | github.com/dgrijalva/jwt-go
+gopsutil   | BSD       | 2.15.01 | github.com/shirou/gopsutil
+lumberjack | MIT       | 2.1     | github.com/natefinch/lumberjack
+go-sqlite3 | MIT       | 1.10.0  | github.com/mattn/go-sqlite3

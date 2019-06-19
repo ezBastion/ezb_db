@@ -50,10 +50,14 @@ this commande will create folder and the default config.json file.
 }
 ```
 
-- default_sta: Used during db initialisation, to set the default authentification node. This STA provide authent for admin console.
-- listenjwt: HTTP listner address and port used by admin console.
-- listenpki: HTTP listner address and port used by STA and bastion (ezb_srv)
-- ezb_pki: TCP listner address and port used to request certificat.
+- **default_sta**: Used during db initialisation, to set the default authentification node. This STA provide authent for admin console.
+- **listenjwt**: HTTP listner address and port used by admin console.
+- **listenpki**: HTTP listner address and port used by STA and bastion (ezb_srv)
+- **ezb_pki**: TCP listner address and port used to request certificat.
+- **loglevel**: Choose log level in debug,info,warning,error,critical.
+- **maxsize**: is the maximum size in megabytes of the log file before it gets rotated. It defaults to 100 megabytes.
+- **maxbackups**: MaxBackups is the maximum number of old log files to retain.
+- **maxage**: MaxAge is the maximum number of days to retain old log files based on the timestamp encoded in their filename.
 
 ### 4. Install Windows service and start it.
 

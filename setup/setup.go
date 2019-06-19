@@ -31,7 +31,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -122,8 +121,8 @@ func Setup(isIntSess bool) error {
 		fmt.Println("ex: 10.20.1.2:6000 pki.domain.local:6000")
 
 		for {
-			p := askForValue("ezb_pki", conf.EzbPki, `^[a-zA-Z0-9-\.]+:[0-9]{4,5}$`)
-			c := askForConfirmation(fmt.Sprintf("pki address (%s) ok?", p))
+			p := setupmanager.AskForValue("ezb_pki", conf.EzbPki, `^[a-zA-Z0-9-\.]+:[0-9]{4,5}$`)
+			c := setupmanager.AskForConfirmation(fmt.Sprintf("pki address (%s) ok?", p))
 			if c {
 				conn, err := net.Dial("tcp", p)
 				if err != nil {
@@ -142,11 +141,11 @@ func Setup(isIntSess bool) error {
 		for {
 			tmp := conf.SAN
 
-			san := askForValue("SAN (comma separated list)", strings.Join(conf.SAN, ","), `(?m)^[[:ascii:]]*,?$`)
+			san := setupmanager.AskForValue("SAN (comma separated list)", strings.Join(conf.SAN, ","), `(?m)^[[:ascii:]]*,?$`)
 
 			t := strings.Replace(san, " ", "", -1)
 			tmp = strings.Split(t, ",")
-			c := askForConfirmation(fmt.Sprintf("SAN list %s ok?", tmp))
+			c := setupmanager.AskForConfirmation(fmt.Sprintf("SAN list %s ok?", tmp))
 			if c {
 				conf.SAN = tmp
 				break
@@ -316,46 +315,4 @@ func validateCertificate(newCert *x509.Certificate, rootCert *x509.Certificate) 
 	fmt.Println("Successfully verified chain of trust.")
 
 	return nil
-}
-
-func askForConfirmation(s string) bool {
-	reader := bufio.NewReader(os.Stdin)
-
-	for {
-		fmt.Printf("\n%s [y/n]: ", s)
-
-		response, err := reader.ReadString('\n')
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		response = strings.ToLower(strings.TrimSpace(response))
-
-		if response == "y" || response == "yes" {
-			return true
-		} else if response == "n" || response == "no" {
-			return false
-		}
-	}
-}
-func askForValue(s, def string, pattern string) string {
-	reader := bufio.NewReader(os.Stdin)
-	re := regexp.MustCompile(pattern)
-	for {
-		fmt.Printf("%s [%s]: ", s, def)
-
-		response, err := reader.ReadString('\n')
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		response = strings.TrimSpace(response)
-		if response == "" {
-			return def
-		} else if re.MatchString(response) {
-			return response
-		} else {
-			fmt.Printf("[%s] wrong format, must match (%s)\n", response, pattern)
-		}
-	}
 }

@@ -79,14 +79,7 @@ func mainGin(serverchan *chan bool) {
 	if err != nil {
 		panic(err)
 	}
-	// logmanager.SetLogLevel(conf.Logger.LogLevel, exPath)
 	logmanager.SetLogLevel(conf.Logger.LogLevel, exPath, path.Join(exPath, "log/ezb_db.log"), conf.Logger.MaxSize, conf.Logger.MaxBackups, conf.Logger.MaxAge)
-	// log.SetOutput(&lumberjack.Logger{
-	// 	Filename:   path.Join(exPath, "log/ezb_db.log"),
-	// 	MaxSize:    conf.Logger.MaxSize,
-	// 	MaxBackups: conf.Logger.MaxBackups,
-	// 	MaxAge:     conf.Logger.MaxAge,
-	// })
 
 	log.WithFields(log.Fields{"module": "main", "type": "log"})
 	log.Debug("loglevel: ", conf.Logger.LogLevel)

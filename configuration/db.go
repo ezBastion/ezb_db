@@ -17,7 +17,6 @@ package configuration
 
 import (
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"path"
 
@@ -45,6 +44,7 @@ func (*GormLogger) Print(v ...interface{}) {
 func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 	var db *gorm.DB
 	var err error
+	log.Debug("db: ", conf.DB)
 	switch DB := conf.DB; DB {
 	case "sqlite":
 		db, err = gorm.Open("sqlite3", path.Join(exPath, conf.SQLITE.DBPath))
@@ -56,7 +56,7 @@ func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 		db.Exec("PRAGMA foreign_keys = OFF")
 
 	default:
-		log.Fatal(errors.New("unknow db type."))
+		log.Fatal("unknow db type.")
 		panic("unknow db type.")
 	}
 	db.SetLogger(&GormLogger{})

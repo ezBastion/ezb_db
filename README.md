@@ -35,7 +35,12 @@ this commande will create folder and the default config.json file.
     },
     "servicename": "ezb_db",
     "servicefullname": "ezBastion Database",
-    "loglevel": "debug",
+    "logger": {
+        "loglevel": "debug",
+        "maxsize": 10,
+        "maxbackups": 5,
+        "maxage": 180
+    },
     "ezb_pki": "change.me:5500",
     "san": [
         "change.me",

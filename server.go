@@ -19,9 +19,6 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
-	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -32,6 +29,10 @@ import (
 
 	"github.com/ezBastion/ezb_db/configuration"
 	"github.com/ezBastion/ezb_db/routes"
+	"github.com/ezBastion/ezb_db/setup"
+	"github.com/ezbastion/ezb_lib/logmanager"
+	"golang.org/x/sync/errgroup"
+	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/ezBastion/ezb_db/Middleware"
 
@@ -40,17 +41,12 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/sync/errgroup"
 )
 
-var (
-	g errgroup.Group
-)
+var g errgroup.Group
 
-func init() {
-}
 func routerJWT(db *gorm.DB, lic configuration.License, conf configuration.Configuration) http.Handler {
-	loggerJWT := log.WithFields(log.Fields{"module": "jwt", "type": "log"})
+	loggerJWT := log.WithFields(log.Fields{"module": "jwt", "type": "http"})
 	r := gin.Default()
 	r.Use(ginrus.Ginrus(loggerJWT, time.RFC3339, true))
 	r.Use(Middleware.AddHeaders)
@@ -65,7 +61,7 @@ func routerJWT(db *gorm.DB, lic configuration.License, conf configuration.Config
 }
 
 func routerPKI(db *gorm.DB, lic configuration.License) http.Handler {
-	loggerPKI := log.WithFields(log.Fields{"module": "pki", "type": "log"})
+	loggerPKI := log.WithFields(log.Fields{"module": "pki", "type": "http"})
 	r := gin.Default()
 	r.Use(ginrus.Ginrus(loggerPKI, time.RFC3339, true))
 	r.Use(Middleware.AddHeaders)
@@ -78,98 +74,37 @@ func routerPKI(db *gorm.DB, lic configuration.License) http.Handler {
 	return r
 }
 func mainGin(serverchan *chan bool) {
-
-	// log.SetFormatter(&log.JSONFormatter{})
-	log.WithFields(log.Fields{"module": "main", "type": "log"})
-	// isIntSess, err := svc.IsAnInteractiveSession()
-	// if err != nil {
-	// 	log.Fatalf("failed to determine if we are running in an interactive session: %v", err)
-	// }
-	// var exPath string
-	// if !isIntSess {
-	// 	exPath = "./"
-	// } else {
 	ex, _ := os.Executable()
-	exPath := filepath.Dir(ex)
-	// }
-	conf := configuration.Configuration{}
-	lic := configuration.License{}
-	confFile := path.Join(exPath, "conf\\config.json")
-
-	configFile, err := os.Open(confFile)
-	defer configFile.Close()
+	exPath = filepath.Dir(ex)
+	conf, err := setup.CheckConfig()
 	if err != nil {
-		elog.Error(650, err.Error())
-		log.Fatal(err)
 		panic(err)
 	}
-	jsonParser := json.NewDecoder(configFile)
-	err = jsonParser.Decode(&conf)
+	logmanager.SetLogLevel(conf.Logger.LogLevel, exPath)
+	log.SetOutput(&lumberjack.Logger{
+		Filename:   path.Join(exPath, "log/ezb_db.log"),
+		MaxSize:    conf.Logger.MaxSize,
+		MaxBackups: conf.Logger.MaxBackups,
+		MaxAge:     conf.Logger.MaxAge,
+	})
 
-	/* log */
-	log.SetFormatter(&log.JSONFormatter{})
-	outlog := true
-	switch conf.LogLevel {
-	case "debug":
-		log.SetLevel(log.DebugLevel)
-		break
-	case "info":
-		log.SetLevel(log.InfoLevel)
-		break
-	case "warning":
-		log.SetLevel(log.WarnLevel)
-		break
-	case "error":
-		log.SetLevel(log.ErrorLevel)
-		break
-	case "critical":
-		log.SetLevel(log.FatalLevel)
-		break
-	default:
-		outlog = false
-	}
-	if outlog {
-		if _, err := os.Stat(path.Join(exPath, "log")); os.IsNotExist(err) {
-			err = os.MkdirAll(path.Join(exPath, "log"), 0600)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-		t := time.Now().UTC()
-		l := fmt.Sprintf("log/ezb_db-%d%d.log", t.Year(), t.YearDay())
-		f, _ := os.OpenFile(path.Join(exPath, l), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		defer f.Close()
-		log.SetOutput(io.MultiWriter(f))
+	log.WithFields(log.Fields{"module": "main", "type": "log"})
+	log.Debug("loglevel: ", conf.Logger.LogLevel)
 
-		ti := time.NewTicker(1 * time.Minute)
-		defer ti.Stop()
-		go func() {
-			for range ti.C {
-				t := time.Now().UTC()
-				l := fmt.Sprintf("log/ezb_db-%d%d.log", t.Year(), t.YearDay())
-				f, _ := os.OpenFile(path.Join(exPath, l), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-				defer f.Close()
-				log.SetOutput(io.MultiWriter(f))
-			}
-		}()
-	}
-	/* log */
+	lic := configuration.License{}
 
 	gin.SetMode(gin.ReleaseMode)
 	db, err := configuration.InitDB(conf, exPath)
 	if err != nil {
-		elog.Error(651, fmt.Sprintf("err:%s db path:%s", err.Error(), conf.SQLITE.DBPath))
 		log.Fatal(err)
 		panic(err)
 	}
 	err = configuration.InitLic(&lic, db)
 	if err != nil {
-		elog.Error(652, err.Error())
 		log.Fatal(err)
 	}
 	caCert, err := ioutil.ReadFile(path.Join(exPath, conf.CaCert))
 	if err != nil {
-		elog.Error(652, err.Error())
 		log.Fatal(err)
 	}
 	caCertPool := x509.NewCertPool()
@@ -212,7 +147,6 @@ func mainGin(serverchan *chan bool) {
 		return serverPKI.ListenAndServeTLS(path.Join(exPath, conf.PublicCert), path.Join(exPath, conf.PrivateKey))
 	})
 	if err := g.Wait(); err != nil {
-		elog.Error(666, err.Error())
 		log.Fatal(err)
 	}
 

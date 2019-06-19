@@ -27,7 +27,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"os"
 	"path"
@@ -35,58 +34,48 @@ import (
 	"regexp"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/ezBastion/ezb_db/configuration"
+	"github.com/ezbastion/ezb_lib/setupmanager"
 
 	fqdn "github.com/ShowMax/go-fqdn"
 )
 
-var exPath string
+var (
+	exPath   string
+	confFile string
+)
 
 func init() {
 	ex, _ := os.Executable()
 	exPath = filepath.Dir(ex)
+	confFile = path.Join(exPath, "conf/config.json")
 }
 
-func CheckConfig(isIntSess bool) (conf configuration.Configuration, err error) {
-	confFile := path.Join(exPath, "conf/config.json")
+func CheckConfig() (conf configuration.Configuration, err error) {
 	raw, err := ioutil.ReadFile(confFile)
 	if err != nil {
 		return conf, err
 	}
 	json.Unmarshal(raw, &conf)
+	log.Debug("json config found and loaded.")
 	return conf, nil
 }
 
-func CheckFolder(isIntSess bool) {
-
-	if _, err := os.Stat(path.Join(exPath, "cert")); os.IsNotExist(err) {
-		err = os.MkdirAll(path.Join(exPath, "cert"), 0600)
-		if err != nil {
-			return
-		}
-		log.Println("Make cert folder.")
-	}
-	if _, err := os.Stat(path.Join(exPath, "log")); os.IsNotExist(err) {
-		err = os.MkdirAll(path.Join(exPath, "log"), 0600)
-		if err != nil {
-			return
-		}
-		log.Println("Make log folder.")
-	}
-	if _, err := os.Stat(path.Join(exPath, "conf")); os.IsNotExist(err) {
-		err = os.MkdirAll(path.Join(exPath, "conf"), 0600)
-		if err != nil {
-			return
-		}
-		log.Println("Make conf folder.")
+func CheckDBFolder() error {
+	err := setupmanager.CheckFolder(exPath)
+	if err != nil {
+		return err
 	}
 	if _, err := os.Stat(path.Join(exPath, "db")); os.IsNotExist(err) {
 		err = os.MkdirAll(path.Join(exPath, "db"), 0600)
 		if err != nil {
-			return
+			return err
 		}
 		log.Println("Make db folder.")
 	}
+	return nil
 }
 
 func Setup(isIntSess bool) error {
@@ -94,16 +83,21 @@ func Setup(isIntSess bool) error {
 	_fqdn := fqdn.Get()
 	quiet := true
 	hostname, _ := os.Hostname()
-	confFile := path.Join(exPath, "conf/config.json")
-	CheckFolder(isIntSess)
-	conf, err := CheckConfig(isIntSess)
+	err := CheckDBFolder()
+	if err != nil {
+		return err
+	}
+	conf, err := CheckConfig()
 	if err != nil {
 		quiet = false
 		conf.ListenJWT = ":8443"
 		conf.ListenPKI = ":8444"
 		conf.ServiceFullName = "Easy Bastion Database"
 		conf.ServiceName = "ezb_db"
-		conf.LogLevel = "warning"
+		conf.Logger.LogLevel = "warning"
+		conf.Logger.MaxSize = 10
+		conf.Logger.MaxBackups = 5
+		conf.Logger.MaxAge = 180
 		conf.CaCert = "cert/ca.crt"
 		conf.PrivateKey = "cert/ezb_db.key"
 		conf.PublicCert = "cert/ezb_db.crt"
@@ -171,111 +165,7 @@ func Setup(isIntSess bool) error {
 		ioutil.WriteFile(confFile, c, 0600)
 		log.Println(confFile, " saved.")
 	}
-	// var exPath string
-	// ServiceName := "ezb_db"
-	// if isIntSess {
-	// 	exPath = "./"
-	// } else {
-	// 	ex, _ := os.Executable()
-	// 	exPath = filepath.Dir(ex)
-	// }
 
-	// conf := configuration.Configuration{}
-	// confFile := path.Join(exPath, "conf/config.json")
-	// if _, err := os.Stat(path.Join(exPath, "cert")); os.IsNotExist(err) {
-	// 	err = os.MkdirAll(path.Join(exPath, "cert"), 0600)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	log.Println("Make cert folder.")
-	// }
-	// if _, err := os.Stat(path.Join(exPath, "log")); os.IsNotExist(err) {
-	// 	err = os.MkdirAll(path.Join(exPath, "log"), 0600)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	log.Println("Make log folder.")
-	// }
-	// if _, err := os.Stat(path.Join(exPath, "db")); os.IsNotExist(err) {
-	// 	err = os.MkdirAll(path.Join(exPath, "db"), 0600)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	log.Println("Make db folder.")
-	// }
-	// if _, err := os.Stat(path.Join(exPath, "conf")); os.IsNotExist(err) {
-	// 	err = os.MkdirAll(path.Join(exPath, "conf"), 0600)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	log.Println("Make conf folder.")
-	// }
-	// if _, err := os.Stat(confFile); os.IsNotExist(err) {
-
-	// 	fmt.Println("\nWhich port do you want to listen for ezb_adm (jwt auth)?")
-	// 	fmt.Println("ex: :4443, 0.0.0.0:4443, localhost:4443, name.domain:4443 ...")
-	// 	for {
-	// 		listenJWT := askForValue("listen jwt", "^[\\.0-9|\\w]*:[0-9]{1,5}$")
-	// 		c := askForConfirmation(fmt.Sprintf("Listen jwt on (%s) ok?", listenJWT))
-	// 		if c {
-	// 			conf.ListenJWT = listenJWT
-	// 			break
-	// 		}
-	// 	}
-	// 	fmt.Println("\nWhich port do you want to listen for ezBastion nodes (pki auth)?")
-	// 	fmt.Println("ex: :4444, 0.0.0.0:4444, localhost:4444, name.domain:4444 ...")
-	// 	for {
-	// 		listenPKI := askForValue("listen pki", "^[\\.0-9|\\w]*:[0-9]{1,5}$")
-	// 		c := askForConfirmation(fmt.Sprintf("Listen pki on (%s) ok?", listenPKI))
-	// 		if c {
-	// 			conf.ListenPKI = listenPKI
-	// 			break
-	// 		}
-	// 	}
-
-	// 	_fqdn := fqdn.Get()
-	// 	hostname, _ := os.Hostname()
-	// 	var addresses []string
-	// 	var tmp []string
-	// 	fmt.Println("\nCertificat Subject Alternative Name.")
-	// 	fmt.Printf("\nBy default using: <%s, %s> as SAN. Add more ?\n", _fqdn, hostname)
-	// 	for {
-	// 		tmp = []string{_fqdn, hostname}
-	// 		san := askForValue("SAN (comma separated list)", `(?m)^[[:ascii:]]*,?$`)
-	// 		for _, a := range strings.Split(san, ",") {
-	// 			tmp = append(tmp, strings.TrimSpace(a))
-	// 		}
-	// 		c := askForConfirmation(fmt.Sprintf("Subject Alternative Name list %s ok?", tmp))
-	// 		if c {
-	// 			addresses = tmp
-	// 			break
-	// 		}
-	// 	}
-
-	// 	conf.ServiceName = ServiceName
-	// 	conf.ServiceFullName = "Easy Bastion Database"
-	// 	conf.DB = "sqlite"
-	// 	conf.Debug = false
-	// 	conf.SQLITE.DBPath = path.Join(exPath, "db/ezb_db.db")
-	// 	// addresses := []string{"chavdesk.chavers.local", "localhost", "127.0.0.1"}
-	// 	// if len(flag.Args()) > 0 {
-	// 	// 	addresses = flag.Args()
-	// 	// }
-
-	// 	// addresses = append(addresses, fqdn.Get())
-	// 	conf.CaCert = "cert/ca.crt"
-	// 	conf.PrivateKey = fmt.Sprintf("cert/%s.key", ServiceName)
-	// 	conf.PublicCert = fmt.Sprintf("cert/%s.crt", ServiceName)
-	// 	keyFile := path.Join(exPath, conf.PrivateKey)
-	// 	certFile := path.Join(exPath, conf.PublicCert)
-	// 	caFile := path.Join(exPath, "cert/ca.crt")
-	// 	request := newCertificateRequest(ServiceName, 730, addresses)
-	// 	generate(request, certFile, keyFile, caFile)
-
-	// 	c, _ := json.Marshal(conf)
-	// 	ioutil.WriteFile(confFile, c, 0600)
-	// 	log.Println(confFile, " saved.")
-	// }
 	return nil
 }
 

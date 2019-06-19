@@ -15,24 +15,22 @@
 
 package configuration
 
+import "github.com/ezbastion/ezb_lib/confmanager"
+
 type Configuration struct {
-	// MYSQL           MYSql  `json:"mysql"`
-	// MSSQL           SQL    `json:"mssql"`
-	// JwtPubKey       string   `json:"jwtpubkey"`
-	// Debug           bool     `json:"debug"`
-	ListenJWT       string   `json:"listenjwt"`
-	ListenPKI       string   `json:"listenpki"`
-	PrivateKey      string   `json:"privatekey"`
-	PublicCert      string   `json:"publiccert"`
-	CaCert          string   `json:"cacert"`
-	DB              string   `json:"db"`
-	SQLITE          SQLite   `json:"sqlite"`
-	ServiceName     string   `json:"servicename"`
-	ServiceFullName string   `json:"servicefullname"`
-	LogLevel        string   `json:"loglevel"`
-	EzbPki          string   `json:"ezb_pki"`
-	SAN             []string `json:"san"`
-	STA             string   `json:"default_sta"`
+	ListenJWT       string             `json:"listenjwt"`
+	ListenPKI       string             `json:"listenpki"`
+	PrivateKey      string             `json:"privatekey"`
+	PublicCert      string             `json:"publiccert"`
+	CaCert          string             `json:"cacert"`
+	DB              string             `json:"db"`
+	SQLITE          SQLite             `json:"sqlite"`
+	ServiceName     string             `json:"servicename"`
+	ServiceFullName string             `json:"servicefullname"`
+	EzbPki          string             `json:"ezb_pki"`
+	SAN             []string           `json:"san"`
+	STA             string             `json:"default_sta"`
+	Logger          confmanager.Logger `json:"logger"`
 }
 
 type SQL struct {

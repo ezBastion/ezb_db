@@ -21,10 +21,16 @@ import (
 	"log"
 	"os"
 
+	"github.com/ezBastion/ezb_db/configuration"
 	"github.com/ezBastion/ezb_db/setup"
 
 	"github.com/urfave/cli"
 	"golang.org/x/sys/windows/svc"
+)
+
+var (
+	exPath string
+	conf   configuration.Configuration
 )
 
 func main() {
@@ -34,7 +40,7 @@ func main() {
 		log.Fatalf("failed to determine if we are running in an interactive session: %v", err)
 	}
 	if !isIntSess {
-		conf, err := setup.CheckConfig(false)
+		conf, err := setup.CheckConfig()
 		if err == nil {
 			runService(conf.ServiceName, false)
 		}
@@ -57,7 +63,7 @@ func main() {
 			Name:  "debug",
 			Usage: "Start ezb_db in console.",
 			Action: func(c *cli.Context) error {
-				conf, _ := setup.CheckConfig(true)
+				conf, _ := setup.CheckConfig()
 				runService(conf.ServiceName, true)
 				return nil
 			},
@@ -65,28 +71,28 @@ func main() {
 			Name:  "install",
 			Usage: "Add ezb_db deamon windows service.",
 			Action: func(c *cli.Context) error {
-				conf, _ := setup.CheckConfig(true)
+				conf, _ := setup.CheckConfig()
 				return installService(conf.ServiceName, conf.ServiceFullName)
 			},
 		}, {
 			Name:  "remove",
 			Usage: "Remove ezb_db deamon windows service.",
 			Action: func(c *cli.Context) error {
-				conf, _ := setup.CheckConfig(true)
+				conf, _ := setup.CheckConfig()
 				return removeService(conf.ServiceName)
 			},
 		}, {
 			Name:  "start",
 			Usage: "Start ezb_db deamon windows service.",
 			Action: func(c *cli.Context) error {
-				conf, _ := setup.CheckConfig(true)
+				conf, _ := setup.CheckConfig()
 				return startService(conf.ServiceName)
 			},
 		}, {
 			Name:  "stop",
 			Usage: "Stop ezb_db deamon windows service.",
 			Action: func(c *cli.Context) error {
-				conf, _ := setup.CheckConfig(true)
+				conf, _ := setup.CheckConfig()
 				return controlService(conf.ServiceName, svc.Stop, svc.Stopped)
 			},
 		},

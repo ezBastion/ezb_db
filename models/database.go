@@ -51,6 +51,7 @@ type EzbActions struct {
 	Constant         string           `json:"constant" sql:"type:text"`
 	Deprecated       int              `json:"deprecated" gorm:"not null; default:'0'"` //false or new action id
 	Anonymous        bool             `gorm:"not null;default:'0'" json:"anonymous"  `
+	LongPooling      bool             `gorm:"not null;default:'0'" json:"longpooling"`
 }
 
 type EzbCollections struct {
@@ -119,7 +120,6 @@ type EzbJobs struct {
 	Checksum string `json:"checksum"`
 	Path     string `json:"path"`
 	Cache    int    `json:"cache"`
-	Async    bool   `json:"async"`
 	Output   string `json:"output" sql:"type:text"`
 }
 type EzbWorkers struct {

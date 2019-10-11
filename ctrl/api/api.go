@@ -29,7 +29,7 @@ import (
 
 func Find(c *gin.Context) {
 	var Raw []models.EzbApi
-	al, _ := c.MustGet("apiLimit").(int)
+	// al, _ := c.MustGet("apiLimit").(int)
 	db, err := tools.Getdbconn(c)
 	if err != "" {
 		c.JSON(http.StatusInternalServerError, err)
@@ -46,10 +46,10 @@ func Find(c *gin.Context) {
 		RGX string `json:"regex"`
 	}
 	var Ret []api
-	for i, r := range Raw {
-		if i > al {
-			break
-		}
+	for _, r := range Raw {
+		// if i > al {
+		// 	break
+		// }
 		var a api
 		a.ID = r.ID
 		a.URL = fmt.Sprintf("%s %s/v%d/%s/%s", r.Access, r.Bastion, r.Version, r.Ctrl, r.Action)

@@ -51,7 +51,7 @@ type EzbActions struct {
 	Constant         string           `json:"constant" sql:"type:text"`
 	Deprecated       int              `json:"deprecated" gorm:"not null; default:'0'"` //false or new action id
 	Anonymous        bool             `gorm:"not null;default:'0'" json:"anonymous"  `
-	LongPooling      bool             `gorm:"not null;default:'0'" json:"longpooling"`
+	Polling          bool             `gorm:"not null;default:'0'" json:"polling"`
 }
 
 type EzbCollections struct {

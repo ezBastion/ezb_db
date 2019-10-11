@@ -2,6 +2,9 @@
 
 **ATTN**: This project uses [semantic versioning](http://semver.org/).
 
+## 0.1.4 - 2019-10-12
+- Fix api limitation with same path
+- Add Polling support
 
 ## 0.1.3 - 2019-06-19
 - Fix log rotate loc file

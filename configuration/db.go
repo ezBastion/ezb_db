@@ -253,7 +253,7 @@ func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 func sandbox(db *gorm.DB) {
 	// var Tags = m.EzbTags{Name: "tag1", Comment: "nada"}
 	// db.FirstOrCreate(&Tags)
-	var Jobs = m.EzbJobs{Name: "job1", Enable: true, Comment: "nada", Checksum: "XXXX", Async: false, Cache: 10, Path: "/xa/applications/getapp.ps1"}
+	var Jobs = m.EzbJobs{Name: "job1", Enable: true, Comment: "nada", Checksum: "XXXX", Cache: 10, Path: "/xa/applications/getapp.ps1"}
 	db.FirstOrCreate(&Jobs)
 	var Groups = m.EzbGroups{Name: "group1", Comment: "nada", Enable: true}
 	db.FirstOrCreate(&Groups)

@@ -20,6 +20,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/sha256"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/binary"
@@ -32,11 +33,13 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-
-	log "github.com/sirupsen/logrus"
+	"time"
 
 	"github.com/ezBastion/ezb_db/configuration"
+	m "github.com/ezBastion/ezb_db/models"
+	"github.com/ezBastion/ezb_db/tools"
 	"github.com/ezbastion/ezb_lib/setupmanager"
+	log "github.com/sirupsen/logrus"
 
 	fqdn "github.com/ShowMax/go-fqdn"
 )
@@ -314,5 +317,50 @@ func validateCertificate(newCert *x509.Certificate, rootCert *x509.Certificate) 
 	}
 	fmt.Println("Successfully verified chain of trust.")
 
+	return nil
+}
+
+func ResetPWD() error {
+	ex, _ := os.Executable()
+	exPath = filepath.Dir(ex)
+	conf, _ := CheckConfig()
+	db, err := configuration.InitDB(conf, exPath)
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
+	newAdmin := fmt.Sprintf("adm%s", tools.RandString(6, "abcdefghijklmnopqrstuvwxyz"))
+	newPasswd := tools.RandString(7, "")
+	salt := tools.RandString(5, "")
+	fmt.Println("A new admin account will be created.")
+	for {
+		c := setupmanager.AskForConfirmation("Create new admin account?")
+		if c {
+			break
+		} else {
+			return nil
+		}
+	}
+
+	var Adm m.EzbAccounts
+	defpwd := fmt.Sprintf("%x", sha256.Sum256([]byte(newPasswd+salt)))
+	currentTime := time.Now()
+	db.Where(m.EzbAccounts{Name: newAdmin}).Attrs(m.EzbAccounts{Enable: true, Comment: fmt.Sprintf("backup admin create by %s on %s", os.Getenv("USERNAME"), currentTime.Format("2006-01-02")), Salt: salt, Password: defpwd, Type: "i", Isadmin: true}).FirstOrCreate(&Adm)
+
+	fmt.Println("Login with this new account to reset real one.")
+	fmt.Printf("user: %s\n", newAdmin)
+	fmt.Printf("password: %s\n", newPasswd)
+	return nil
+}
+
+func DumpDB() error {
+	ex, _ := os.Executable()
+	exPath = filepath.Dir(ex)
+	conf, _ := CheckConfig()
+	db, err := configuration.InitDB(conf, exPath)
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
 	return nil
 }

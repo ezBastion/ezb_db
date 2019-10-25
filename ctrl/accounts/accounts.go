@@ -16,9 +16,10 @@
 package accounts
 
 import (
+	"net/http"
+
 	"github.com/ezBastion/ezb_db/models"
 	"github.com/ezBastion/ezb_db/tools"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -92,7 +93,7 @@ func Add(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	Raw.Salt = tools.RandString(5)
+	Raw.Salt = tools.RandString(5, "")
 	db.NewRecord(&Raw)
 	if err := db.Create(&Raw).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

@@ -26,13 +26,16 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func RandString(n int) string {
+func RandString(n int, letterBytes string) string {
+
+	if letterBytes == "" {
+		letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	}
+
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]

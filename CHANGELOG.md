@@ -2,7 +2,7 @@
 
 **ATTN**: This project uses [semantic versioning](http://semver.org/).
 
-## 0.1.4 - 2019-10-12
+## 0.2.0 - 2019-10-12
 - Fix api limitation with same path
 - Add Polling support
 

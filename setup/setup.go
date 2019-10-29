@@ -1,5 +1,4 @@
-// This file is part of ezBastion.
-
+//     This file is part of ezBastion.
 //     ezBastion is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU Affero General Public License as published by
 //     the Free Software Foundation, either version 3 of the License, or
@@ -35,13 +34,13 @@ import (
 	"strings"
 	"time"
 
+	fqdn "github.com/ShowMax/go-fqdn"
 	"github.com/ezBastion/ezb_db/configuration"
 	m "github.com/ezBastion/ezb_db/models"
 	"github.com/ezBastion/ezb_db/tools"
 	"github.com/ezbastion/ezb_lib/setupmanager"
+	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
-
-	fqdn "github.com/ShowMax/go-fqdn"
 )
 
 var (
@@ -354,6 +353,7 @@ func ResetPWD() error {
 }
 
 func DumpDB() error {
+	var db *gorm.DB
 	ex, _ := os.Executable()
 	exPath = filepath.Dir(ex)
 	conf, _ := CheckConfig()
@@ -362,5 +362,66 @@ func DumpDB() error {
 		log.Fatal(err)
 		panic(err)
 	}
+
+	f := map[string]interface{}{}
+
+	var access []m.EzbAccess
+	err = db.Find(&access).Error
+	f["access"] = access
+
+	var account []m.EzbAccounts
+	err = db.Find(&account).Error
+	f["account"] = account
+
+	var action []m.EzbActions
+	err = db.Find(&action).Error
+	f["action"] = action
+
+	var collection []m.EzbCollections
+	err = db.Find(&collection).Error
+	f["collection"] = collection
+
+	var controller []m.EzbControllers
+	err = db.Find(&controller).Error
+	f["controller"] = controller
+
+	var group []m.EzbGroups
+	err = db.Find(&group).Error
+	f["group"] = group
+
+	var job []m.EzbJobs
+	err = db.Find(&job).Error
+	f["job"] = job
+
+	var tag []m.EzbTags
+	err = db.Find(&tag).Error
+	f["tag"] = tag
+
+	var worker []m.EzbWorkers
+	err = db.Find(&worker).Error
+	f["worker"] = worker
+
+	var sta []m.EzbStas
+	err = db.Find(&sta).Error
+	f["sta"] = sta
+
+	var bastion []m.EzbBastions
+	err = db.Find(&bastion).Error
+	f["bastion"] = bastion
+
+	var license []m.EzbLicense
+	err = db.Find(&license).Error
+	f["license"] = license
+
+	c, err := json.Marshal(f)
+	statusFile := filepath.Join(exPath, "dbdump.json")
+	err = ioutil.WriteFile(statusFile, c, 0600)
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
+
+	fmt.Println("Database save to", statusFile )
+
 	return nil
 }

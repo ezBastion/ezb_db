@@ -113,6 +113,14 @@ func main() {
 				return err
 			},
 		},
+		{
+			Name:  "restore",
+			Usage: "Restore db from file.",
+			Action: func(c *cli.Context) error {
+				err := setup.RestoreDB()
+				return err
+			},
+		},
 	}
 
 	cli.AppHelpTemplate = fmt.Sprintf(`

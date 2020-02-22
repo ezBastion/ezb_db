@@ -49,7 +49,7 @@ func main() {
 	}
 	app := cli.NewApp()
 	app.Name = "ezb_db"
-	app.Version = "0.1.4"
+	app.Version = "0.3.0"
 	app.Usage = "Manage ezBastion database."
 
 	app.Commands = []cli.Command{
@@ -95,6 +95,30 @@ func main() {
 			Action: func(c *cli.Context) error {
 				conf, _ := setup.CheckConfig()
 				return controlService(conf.ServiceName, svc.Stop, svc.Stopped)
+			},
+		},
+		{
+			Name:  "newadmin",
+			Usage: "Add an admin account.",
+			Action: func(c *cli.Context) error {
+				err := setup.ResetPWD()
+				return err
+			},
+		},
+		{
+			Name:  "backup",
+			Usage: "Dump db in file.",
+			Action: func(c *cli.Context) error {
+				err := setup.DumpDB()
+				return err
+			},
+		},
+		{
+			Name:  "restore",
+			Usage: "Restore db from file.",
+			Action: func(c *cli.Context) error {
+				err := setup.RestoreDB()
+				return err
 			},
 		},
 	}

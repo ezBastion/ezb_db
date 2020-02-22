@@ -80,7 +80,7 @@ func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 		db.CreateTable(&m.EzbAccounts{})
 		db.Model(&m.EzbAccounts{}).AddUniqueIndex("idx_accounts_id", "id")
 		var Adm m.EzbAccounts
-		salt := tools.RandString(5)
+		salt := tools.RandString(5, "")
 		defpwd := fmt.Sprintf("%x", sha256.Sum256([]byte("ezbastion"+salt)))
 		db.Where(m.EzbAccounts{Name: "admin"}).Attrs(m.EzbAccounts{Enable: true, Comment: "ezBastion admin", Salt: salt, Password: defpwd, Type: "i", Isadmin: true}).FirstOrCreate(&Adm)
 	}
@@ -131,7 +131,7 @@ func InitDB(conf Configuration, exPath string) (*gorm.DB, error) {
 		db.CreateTable(&m.EzbLicense{})
 		serial, err := uuid.NewV4()
 		if err != nil {
-			serial, _ = uuid.FromString(tools.RandString(32))
+			serial, _ = uuid.FromString(tools.RandString(32, ""))
 		}
 		// msg := []byte(fmt.Sprintf("ENT 1970-01-01 2 20 %s", serial))
 		// key := []byte(t.EncryptDecrypt(fmt.Sprintf("%s", serial)))

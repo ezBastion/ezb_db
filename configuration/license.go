@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	t "ezb_priv/tools"
+	t "chavers.localhost/ezb_priv/tools"
 
 	"github.com/ezBastion/ezb_db/models"
 	"github.com/jinzhu/gorm"

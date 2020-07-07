@@ -21,7 +21,7 @@ import (
 	"path"
 
 	m "github.com/ezBastion/ezb_db/models"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 
 	"github.com/ezBastion/ezb_db/tools"
 

@@ -16,11 +16,12 @@
 package logs
 
 import (
-	"github.com/ezBastion/ezb_db/models"
-	"github.com/ezBastion/ezb_db/tools"
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/ezBastion/ezb_db/models"
+	"github.com/ezBastion/ezb_db/tools"
 
 	"github.com/gin-gonic/gin"
 )

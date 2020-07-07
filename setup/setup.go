@@ -38,7 +38,7 @@ import (
 	"github.com/ezBastion/ezb_db/configuration"
 	m "github.com/ezBastion/ezb_db/models"
 	"github.com/ezBastion/ezb_db/tools"
-	"github.com/ezbastion/ezb_lib/setupmanager"
+	"github.com/ezBastion/ezb_lib/setupmanager"
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 )

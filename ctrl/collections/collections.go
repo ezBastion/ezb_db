@@ -16,10 +16,11 @@
 package collections
 
 import (
-	"github.com/ezBastion/ezb_db/models"
-	"github.com/ezBastion/ezb_db/tools"
 	"fmt"
 	"net/http"
+
+	"github.com/ezBastion/ezb_db/models"
+	"github.com/ezBastion/ezb_db/tools"
 
 	"github.com/gin-gonic/gin"
 )

@@ -26,12 +26,12 @@ import (
 	"github.com/ezBastion/ezb_db/ctrl/controllers"
 	"github.com/ezBastion/ezb_db/ctrl/groups"
 	"github.com/ezBastion/ezb_db/ctrl/jobs"
+	"github.com/ezBastion/ezb_db/ctrl/license"
 	"github.com/ezBastion/ezb_db/ctrl/logs"
 	"github.com/ezBastion/ezb_db/ctrl/stas"
 	"github.com/ezBastion/ezb_db/ctrl/stat"
 	"github.com/ezBastion/ezb_db/ctrl/tags"
 	"github.com/ezBastion/ezb_db/ctrl/workers"
-	"github.com/ezbastion/ezb_db/ctrl/license"
 
 	"github.com/gin-gonic/gin"
 )

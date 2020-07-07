@@ -16,9 +16,10 @@
 package jobs
 
 import (
+	"net/http"
+
 	"github.com/ezBastion/ezb_db/models"
 	"github.com/ezBastion/ezb_db/tools"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )

@@ -30,7 +30,7 @@ import (
 	"github.com/ezBastion/ezb_db/configuration"
 	"github.com/ezBastion/ezb_db/routes"
 	"github.com/ezBastion/ezb_db/setup"
-	"github.com/ezbastion/ezb_lib/logmanager"
+	"github.com/ezBastion/ezb_lib/logmanager"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/ezBastion/ezb_db/Middleware"
